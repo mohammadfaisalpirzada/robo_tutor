@@ -249,16 +249,16 @@ type MCQ = {
 
 const offlineBank: Record<string, MCQ[]> = {
   "nursery-counting-10": [
-    { id: "n1", question: "Count the stars: ⭐ ⭐. How many?", options: ["1", "2", "3", "4"], correctAnswer: "2", type: "nursery-counting-10" },
-    { id: "n2", question: "How many apples? 🍎 🍎 🍎", options: ["2", "3", "4", "5"], correctAnswer: "3", type: "nursery-counting-10" },
-    { id: "n3", question: "Count the balls: 🟠 🟠 🟠 🟠. How many?", options: ["3", "4", "5", "6"], correctAnswer: "4", type: "nursery-counting-10" },
-    { id: "n4", question: "How many ducks? 🦆 🦆", options: ["1", "2", "3", "4"], correctAnswer: "2", type: "nursery-counting-10" },
-    { id: "n5", question: "How many circles? ⚪ ⚪ ⚪", options: ["2", "3", "4", "5"], correctAnswer: "3", type: "nursery-counting-10" },
-    { id: "n6", question: "Count the balloons: 🎈 🎈 🎈 🎈 🎈", options: ["4", "5", "6", "7"], correctAnswer: "5", type: "nursery-counting-10" },
-    { id: "n7", question: "How many cats? 🐱 🐱 🐱", options: ["2", "3", "4", "5"], correctAnswer: "3", type: "nursery-counting-10" },
-    { id: "n8", question: "Count the flowers: 🌸 🌸 🌸", options: ["2", "3", "4", "5"], correctAnswer: "3", type: "nursery-counting-10" },
-    { id: "n9", question: "How many suns? ☀️ ☀️", options: ["1", "2", "3", "4"], correctAnswer: "2", type: "nursery-counting-10" },
-    { id: "n10", question: "How many clouds? ☁️ ☁️ ☁️ ☁️", options: ["3", "4", "5", "6"], correctAnswer: "4", type: "nursery-counting-10" }
+    { id: "n1", question: "Count the stars: * *. How many?", options: ["1", "2", "3", "4"], correctAnswer: "2", type: "nursery-counting-10" },
+    { id: "n2", question: "How many apples? * * *", options: ["2", "3", "4", "5"], correctAnswer: "3", type: "nursery-counting-10" },
+    { id: "n3", question: "Count the balls: * * * *. How many?", options: ["3", "4", "5", "6"], correctAnswer: "4", type: "nursery-counting-10" },
+    { id: "n4", question: "How many ducks? * *", options: ["1", "2", "3", "4"], correctAnswer: "2", type: "nursery-counting-10" },
+    { id: "n5", question: "How many circles? * * *", options: ["2", "3", "4", "5"], correctAnswer: "3", type: "nursery-counting-10" },
+    { id: "n6", question: "Count the balloons: * * * * *", options: ["4", "5", "6", "7"], correctAnswer: "5", type: "nursery-counting-10" },
+    { id: "n7", question: "How many cats? * * *", options: ["2", "3", "4", "5"], correctAnswer: "3", type: "nursery-counting-10" },
+    { id: "n8", question: "Count the flowers: * * *", options: ["2", "3", "4", "5"], correctAnswer: "3", type: "nursery-counting-10" },
+    { id: "n9", question: "How many suns? ** **", options: ["1", "2", "3", "4"], correctAnswer: "2", type: "nursery-counting-10" },
+    { id: "n10", question: "How many clouds? ** ** ** **", options: ["3", "4", "5", "6"], correctAnswer: "4", type: "nursery-counting-10" }
   ],
   "nursery-shapes": [
     { id: "s1", question: "Which shape is round like a ball?", options: ["Circle", "Square", "Triangle", "Rectangle"], correctAnswer: "Circle", type: "nursery-shapes" },
@@ -318,7 +318,9 @@ export async function POST(request: Request) {
     let lastError: unknown = null;
     for (const apiKey of apiKeys) {
       try {
-        const model = google("gemini-2.5-flash", { apiKey });
+        // ai-sdk/google uses the env var internally; set per-attempt
+        process.env.GOOGLE_GENERATIVE_AI_API_KEY = apiKey;
+        const model = google("gemini-2.5-flash");
 
         const result = await generateObject({
           model,
