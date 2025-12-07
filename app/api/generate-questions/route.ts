@@ -238,10 +238,75 @@ const getApiKeys = () => {
   return keys;
 };
 
+type MCQ = {
+  id: string;
+  question: string;
+  options: [string, string, string, string];
+  correctAnswer: string;
+  type: string;
+  explanation?: string;
+};
+
+const offlineBank: Record<string, MCQ[]> = {
+  "nursery-counting-10": [
+    { id: "n1", question: "Count the stars: ⭐ ⭐. How many?", options: ["1", "2", "3", "4"], correctAnswer: "2", type: "nursery-counting-10" },
+    { id: "n2", question: "How many apples? 🍎 🍎 🍎", options: ["2", "3", "4", "5"], correctAnswer: "3", type: "nursery-counting-10" },
+    { id: "n3", question: "Count the balls: 🟠 🟠 🟠 🟠. How many?", options: ["3", "4", "5", "6"], correctAnswer: "4", type: "nursery-counting-10" },
+    { id: "n4", question: "How many ducks? 🦆 🦆", options: ["1", "2", "3", "4"], correctAnswer: "2", type: "nursery-counting-10" },
+    { id: "n5", question: "How many circles? ⚪ ⚪ ⚪", options: ["2", "3", "4", "5"], correctAnswer: "3", type: "nursery-counting-10" },
+    { id: "n6", question: "Count the balloons: 🎈 🎈 🎈 🎈 🎈", options: ["4", "5", "6", "7"], correctAnswer: "5", type: "nursery-counting-10" },
+    { id: "n7", question: "How many cats? 🐱 🐱 🐱", options: ["2", "3", "4", "5"], correctAnswer: "3", type: "nursery-counting-10" },
+    { id: "n8", question: "Count the flowers: 🌸 🌸 🌸", options: ["2", "3", "4", "5"], correctAnswer: "3", type: "nursery-counting-10" },
+    { id: "n9", question: "How many suns? ☀️ ☀️", options: ["1", "2", "3", "4"], correctAnswer: "2", type: "nursery-counting-10" },
+    { id: "n10", question: "How many clouds? ☁️ ☁️ ☁️ ☁️", options: ["3", "4", "5", "6"], correctAnswer: "4", type: "nursery-counting-10" }
+  ],
+  "nursery-shapes": [
+    { id: "s1", question: "Which shape is round like a ball?", options: ["Circle", "Square", "Triangle", "Rectangle"], correctAnswer: "Circle", type: "nursery-shapes" },
+    { id: "s2", question: "Which shape has 3 sides?", options: ["Triangle", "Square", "Circle", "Oval"], correctAnswer: "Triangle", type: "nursery-shapes" },
+    { id: "s3", question: "Which shape has 4 equal sides?", options: ["Square", "Triangle", "Circle", "Pentagon"], correctAnswer: "Square", type: "nursery-shapes" },
+    { id: "s4", question: "Which shape looks like a slice of pizza?", options: ["Triangle", "Circle", "Square", "Hexagon"], correctAnswer: "Triangle", type: "nursery-shapes" },
+    { id: "s5", question: "Which shape can roll easily?", options: ["Circle", "Square", "Triangle", "Rectangle"], correctAnswer: "Circle", type: "nursery-shapes" },
+    { id: "s6", question: "Which shape has no corners?", options: ["Circle", "Square", "Triangle", "Rectangle"], correctAnswer: "Circle", type: "nursery-shapes" },
+    { id: "s7", question: "Which shape looks like a box face?", options: ["Square", "Circle", "Triangle", "Oval"], correctAnswer: "Square", type: "nursery-shapes" },
+    { id: "s8", question: "Which shape has 3 corners?", options: ["Triangle", "Square", "Circle", "Rectangle"], correctAnswer: "Triangle", type: "nursery-shapes" },
+    { id: "s9", question: "Which shape is used for wheels?", options: ["Circle", "Triangle", "Square", "Pentagon"], correctAnswer: "Circle", type: "nursery-shapes" },
+    { id: "s10", question: "Which shape looks like a window pane?", options: ["Square", "Circle", "Triangle", "Diamond"], correctAnswer: "Square", type: "nursery-shapes" }
+  ],
+  "nursery-colors": [
+    { id: "c1", question: "What color is the sky on a clear day?", options: ["Blue", "Red", "Green", "Yellow"], correctAnswer: "Blue", type: "nursery-colors" },
+    { id: "c2", question: "What color is a ripe banana?", options: ["Yellow", "Blue", "Black", "Purple"], correctAnswer: "Yellow", type: "nursery-colors" },
+    { id: "c3", question: "Strawberries are usually what color?", options: ["Red", "Blue", "Green", "Purple"], correctAnswer: "Red", type: "nursery-colors" },
+    { id: "c4", question: "Grass is usually what color?", options: ["Green", "Orange", "Pink", "Gray"], correctAnswer: "Green", type: "nursery-colors" },
+    { id: "c5", question: "What color is an orange fruit?", options: ["Orange", "Blue", "Red", "Yellow"], correctAnswer: "Orange", type: "nursery-colors" },
+    { id: "c6", question: "What color is the sun in drawings?", options: ["Yellow", "Blue", "Brown", "Purple"], correctAnswer: "Yellow", type: "nursery-colors" },
+    { id: "c7", question: "What color are most leaves?", options: ["Green", "Black", "Red", "White"], correctAnswer: "Green", type: "nursery-colors" },
+    { id: "c8", question: "What color is a pumpkin?", options: ["Orange", "Blue", "Gray", "Pink"], correctAnswer: "Orange", type: "nursery-colors" },
+    { id: "c9", question: "What color is a watermelon outside?", options: ["Green", "Red", "Blue", "Yellow"], correctAnswer: "Green", type: "nursery-colors" },
+    { id: "c10", question: "What color is a watermelon inside?", options: ["Red", "Green", "Blue", "Gray"], correctAnswer: "Red", type: "nursery-colors" }
+  ]
+};
+
+const pickOffline = (topic: string): MCQ[] => {
+  const bank = offlineBank[topic];
+  if (!bank || bank.length === 0) {
+    const fallback: MCQ[] = Array.from({ length: 10 }).map((_, idx) => ({
+      id: `offline-${idx + 1}`,
+      question: `Practice question ${idx + 1}`,
+      options: ["A", "B", "C", "D"],
+      correctAnswer: "A",
+      type: topic
+    }));
+    return fallback;
+  }
+  return bank.slice(0, 10) as MCQ[];
+};
+
 export async function POST(request: Request) {
+  let parsedTopic: string | undefined;
   try {
     const json = await request.json();
     const { topic, grade } = requestSchema.parse(json);
+    parsedTopic = topic;
 
     const prompt = buildPrompt(topic, grade);
 
@@ -276,9 +341,13 @@ export async function POST(request: Request) {
       }
     }
 
-    throw lastError ?? new Error("Failed to generate questions");
+    const offline = pickOffline(topic);
+    console.warn("Serving offline questions due to API failure", lastError);
+    return NextResponse.json({ questions: offline, source: "offline" });
   } catch (error) {
     console.error("Failed to generate questions", error);
-    return NextResponse.json({ error: "Failed to generate questions" }, { status: 500 });
+    const offlineTopic = parsedTopic ?? topicList[0];
+    const offline = pickOffline(offlineTopic);
+    return NextResponse.json({ questions: offline, source: "offline-error" }, { status: 200 });
   }
 }

@@ -2,6 +2,7 @@
 
 import type { KeyboardEvent } from "react";
 import { useEffect, useRef, useState } from "react";
+import { FaVolumeUp } from "react-icons/fa";
 
 type Question = {
   id: string;
@@ -386,7 +387,7 @@ export default function HomePage() {
   };
 
   const answeredCount = Object.keys(responses).length;
-  const difficultyLabel = difficultyByGrade[grade] === "easy" ? "Easy" : "Hard";
+  const difficultyLabel = grade ? (difficultyByGrade[grade] === "easy" ? "Easy" : "Hard") : "Easy";
   const availableTopics = grade ? gradeTopics[grade] ?? [] : [];
 
   return (
@@ -621,10 +622,7 @@ export default function HomePage() {
                     onClick={() => speak(activeQuestion.question)}
                     aria-label="Play question audio"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-                      <path d="M14 3v10.28A4 4 0 1 1 12 17V7H8V3h6Z" />
-                      <path d="M17 8a6 6 0 0 1 0 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                    </svg>
+                    <FaVolumeUp className="h-4 w-4" />
                   </button>
                 </div>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -724,12 +722,12 @@ export default function HomePage() {
                 <p className="text-sm uppercase tracking-[0.25em] text-indigo-200">See you soon</p>
                 <h2 className="mt-2 text-3xl font-bold sm:text-4xl">Thank you for learning today!</h2>
                 <p className="mt-3 text-base text-slate-100">
-                  "Mathematics is the music of reason-every problem you solve is a note in your own masterpiece."
+                  Mathematics is the music of reason - every problem you solve is a note in your own masterpiece.
                 </p>
               </div>
               <div className="mt-2 flex flex-col gap-2 text-left text-sm text-slate-100 sm:mt-0 sm:text-right">
                 <span className="rounded-xl bg-white/10 px-3 py-2 font-semibold">Stay curious. Keep counting.</span>
-                <span className="rounded-xl bg-white/10 px-3 py-2 font-semibold">We'll be ready when you return.</span>
+                <span className="rounded-xl bg-white/10 px-3 py-2 font-semibold">We will be ready when you return.</span>
               </div>
             </div>
             <div className="mt-6 flex justify-end gap-3">
