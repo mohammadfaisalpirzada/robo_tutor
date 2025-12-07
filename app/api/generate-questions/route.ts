@@ -318,7 +318,7 @@ export async function POST(request: Request) {
     let lastError: unknown = null;
     for (const apiKey of apiKeys) {
       try {
-        // ai-sdk/google uses the env var internally; set per-attempt
+        // ai-sdk/google reads from env; set per attempt
         process.env.GOOGLE_GENERATIVE_AI_API_KEY = apiKey;
         const model = google("gemini-2.5-flash");
 
